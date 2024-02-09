@@ -26,6 +26,7 @@ library(ggpubr)
 
 ``` r
 ##### Scrape baseball-reference's free-agent contract data #####
+
 css_selector = "#fa_signings"
 
 FA_2018 = read_html("https://www.baseball-reference.com/leagues/majors/2018-free-agents.shtml") %>% 
@@ -49,58 +50,79 @@ FA_2016 = read_html("https://www.baseball-reference.com/leagues/majors/2016-free
 
 ``` r
 ## ESPN 2021 free-agent signings
+
 ESPN_selector = "#my-players-table"
 
 ESPN2021_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2021/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2020 free-agent signings
+
 ESPN2020_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2020/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2019 free-agent signings
+
 ESPN2019_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2019/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2018 free-agent signings
+
 ESPN2018_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2018/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2017 free-agent signings
+
 ESPN2017_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2017/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2016 free-agent signings
+
 ESPN2016_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2016/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2015 free-agent signings
+
 ESPN2015_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2015/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2014 free-agent signings
+
 ESPN2014_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2014/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2013 free-agent signings
+
 ESPN2013_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2013/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2012 free-agent signings
+
 ESPN2012_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2012/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2011 free-agent signings
+
 ESPN2011_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2011/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
@@ -156,14 +178,24 @@ Create a df to house compiled contract data from the ESPN dfs
 
 ``` r
   ## Create a 11x14 matrix
+
 FREE_AGENTS = matrix(nrow = 11, ncol = 14)
+
+
   ## Convert to dataframe
+
 FREE_AGENTS = as.data.frame(FREE_AGENTS)
+
+
   ## Add column names
+
 colnames(FREE_AGENTS) = c("Year", "ML Deals", "MiL Deals", "Total Deals", "% ML Deals", "Total Spent",
                           "Avg. Total Contract", "Avg. Length", "Med. Length", "Avg. AAV",
                           "Med. Total Contract", "Med. AAV", "Avg. Age", "Med. Age")
+
+
   ## Loop through and add year values to the year column
+
 for (i in 1:nrow(FREE_AGENTS)){
   FREE_AGENTS[i,1] = seq(2011, 2021, 1)[i]
 }
@@ -183,6 +215,7 @@ contract, and age of player for all major league free-agent deals from
 
 ``` r
   ## Graph on one plot
+
 ggarrange(MeanMedLength, MeanMedAAV, MeanMedTotVal, MeanMedAge,
           ncol = 2, nrow = 2, common.legend = FALSE, labels = "AUTO")
 ```
