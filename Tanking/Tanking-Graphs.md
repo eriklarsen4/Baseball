@@ -122,6 +122,7 @@ Plot every team’s win percentage from 2011-2021, omitting 2020
 
 ``` r
   ## Graph all W-L %s
+
 WL = ggplot(data = TeamValALL[-which(TeamValALL$Year == 2020),]) +
   geom_point(aes(x = Salary, y = W_L, color = Tm), size = 4, alpha = 0.7) +
   geom_abline(slope = as.numeric(coefficients(Sal_W_model)[2]),
@@ -217,6 +218,7 @@ CubsStros_WL = ggplot(data = TANK_DF[-which(TANK_DF$Year == 2020),],
 
 ``` r
   ## Graph the Astros and Cubs' Payrolls
+
 CubsStros_Payrolls = ggplot(data = TANK_DF[-which(TANK_DF$Year == 2020),],
                             aes(x = Year)) +
   geom_line(aes(y = `Team payroll`,
@@ -412,7 +414,9 @@ REBUILDERS_df = TeamValALL %>%
   dplyr::arrange(Year) %>%
   dplyr::slice(-c(9,10,19,22,26,29,36,40,47,53,54))
 
+
 ## Re-arrange for display
+
 Printable_REBUILD = REBUILDERS_df %>%
   dplyr::rename(`MLB Trades Made` = Sum_Num_Trades,
                 `FA Signings` = Sum_Num_FAs,
@@ -440,6 +444,7 @@ Printable_REBUILD = REBUILDERS_df %>%
 
 ``` r
 # Rebuild_T
+
 Printable_REBUILD %>%
   dplyr::slice(c(1:10))
 ```
@@ -594,7 +599,9 @@ Now, prep data for the `WARPM` and `W-L%` plot subsetted on the
 rebuilding teams
 
 ``` r
+
       ## Filter by teams with the same or worse win total as the 2011 Cubs; outside the pandemic
+
 rebuild_idx = which(TeamValALL$W <= 70 & TeamValALL$Year != 2020)
 rebuild_list = unique(TeamValALL$Tm[rebuild_idx])
   ## Subset a new df, add in the "efficiency" stat
