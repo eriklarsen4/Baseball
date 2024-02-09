@@ -87,14 +87,21 @@ for ( i in 11:21 ) {
   }
 }
   ## merge the dfs together
+
 StandALL = purrr::reduce(mget(ls()[which(grepl(ls(), pattern = "Standings") == TRUE)]), full_join)
+
+
   ## correct team name changes
+
 StandALL = StandALL %>%
   dplyr::mutate(Tm = case_when(grepl(Tm, pattern = "Angels") ~ "Los Angeles Angels",
                                grepl(Tm, pattern = "Florida") ~ "Miami Marlins",
                                grepl(Tm, pattern = "Indians") ~ "Cleveland Guardians",
                                TRUE ~ Tm))
+
+
   ## remove the individual dfs
+
 rm(list = ls()[which(grepl(ls(), pattern = "Standings") == T)])
 ```
 
@@ -152,16 +159,22 @@ Clean the data:
 
 ``` r
   ## Combine the each data "type" into one df
+
 Player_Value_Batting_ALL = purrr::reduce(mget(ls()[which(grepl(ls(),
                                                                pattern = "Value_batting") == T)]),
                                          full_join)
 
+
 # Player_Value_pitching_2021 = Player_Value_pitching_2021 %>%
 #   dplyr::select(-RA9extras)
+
 Player_Value_Pitching_ALL = purrr::reduce(mget(ls()[which(grepl(ls(),
                                                                 pattern = "Value_pitching") == T)]),
                                           full_join)
+
+
   ## remove individual (yearly) dfs
+
 rm(list = ls()[which(grepl(ls(), pattern = "batting_2|pitching_2") == T)])
 
 Player_Value_Pitching_ALL = BR_PLAYER_VAL_CLEAN_fn(df = Player_Value_Pitching_ALL, Player_data_type = "pitching")
@@ -180,10 +193,12 @@ hitternames = Player_Value_Batting_ALL %>%
 
 
 ## use the Chadwick DB as a cross-ref for playerids
+
 CHAD_LU = baseballr::chadwick_player_lu()
 
   ## concatenate the separated strings for players with initials as first names;
   ## remove players without bbref ids and remove excess columns
+
 CHAD_LU = CHAD_LU %>%
   dplyr::mutate(name_first = case_when(grepl(name_first, pattern = "[A-Z]\\.") ~
                                          gsub(name_first, pattern = "\\s", replacement = ""),
@@ -203,6 +218,7 @@ CHAD_LU = CHAD_LU %>%
   
   ## function created for this
     ## used to enable scraping individual bbref pages (for when players changed teams in this project)
+
 Player_Value_Batting_ALL = ID_ADD_fn(df = Player_Value_Batting_ALL,
                                      player_type = "hitters",
                                      site_abbrev = "bbref")
@@ -275,6 +291,7 @@ Acquire team salary data
 
 ``` r
   ## Loop through the relevant years and import the tables as dataframes
+
 for ( i in 11:21 ){
   if (i %% 17 == 0 ) {
     
@@ -287,6 +304,7 @@ for ( i in 11:21 ){
     }
 }
   ## Repeat the loop for pitching stats
+
 for ( i in 11:21 ){
   if( i %% 17 == 0 ) {
     
@@ -299,9 +317,12 @@ for ( i in 11:21 ){
   }
 }
   ## Concatenate into a aggregate dataframes by player type
+
 TeamBatALL = purrr::reduce(mget(ls()[which(grepl(ls(), pattern = "Team_batting") == T)]), full_join)
 
+
   ## Remove the Xinn pitching column
+
 Team_pitchingvalue_2021 = Team_pitchingvalue_2021 %>%
   dplyr::select(-RA9extras)
 
@@ -316,6 +337,7 @@ TeamPitALL = TeamPitALL %>%
                                TRUE ~ Tm))
 
 ## Remove league summ rows and correct team names
+
 TeamBatALL = TeamBatALL %>%
   dplyr::filter(Tm != "0" &
                   Tm != "") %>%
@@ -368,6 +390,7 @@ Team_Changers_pitchers = Player_Value_Pitching_ALL %>%
 
 ``` r
   ## Join with Team Value data and remove extra data
+
 TeamBatALL = TeamBatALL %>%
   left_join(Team_Transactions_Sum) %>%
   # dplyr::filter(Year != 2020) %>%
@@ -416,16 +439,26 @@ TeamValALL = StandALL %>%
 ## MLers from ESPN
 
 ``` r
+
   ## Create a variable for a selector
+
 ESPN_selector = "#my-players-table"
+
+
   ## Loop through and import the data for the relevant time-frame
+
 for ( i in 11:21 ) {
   ESPN_FA_import_fn(Year = i, selector = ESPN_selector)
 }
+
+
   ## Combine the dfs into one df
+
 ESPN = purrr::reduce(mget(ls()[which(grepl(ls(), pattern = "ESPN_FA_2") == TRUE)]), full_join)
 
+
   ## Remove FA deals to Japanese baseball league and "undisclosed" deals
+
 ESPN = ESPN %>%
   dplyr::filter(Team != "Japan") %>%
   dplyr::filter(Type != "Undisclosed")
@@ -437,10 +470,14 @@ rm(list = ls()[which(grepl(ls(), pattern = "ESPN_FA_2") == T)])
 
 ``` r
   ## Loop through the scraping function by the relevant years
+
 for ( i in 11:21 ) {
   Spotrac_Intl_import_fn(Year = i, spotrac_selector = spotrac_Intl_selector)
 }
+
+
   ## Put all the dfs into one df and remove the separate dfs
+
 IntlALL = purrr::reduce(mget(ls()[which(grepl(ls(), pattern = "Intl_Signings_2") == T)]), full_join)
 
 rm(list = ls()[which(grepl(ls(), pattern = "Intl_Signings_2") == T)])
@@ -456,12 +493,18 @@ Data is rife with errors, so clean it up
 
 ``` r
   ## set the selector
+
 almanac_selector = "#wrapper > div.container > div.ba-table > table"
+
+
   ## Loop through and scrape the data starting from Epstein and Luhnow hires with Cubs/Astros (2011) to present
+
 for ( i in 11:21 ){
   BBA_IMPORT_fn(Year = i, selector = almanac_selector)
 }
+
   ## Merge the dataframes together
+
 BBA_DRAFT_ALL = purrr::reduce(mget(ls()[which(grepl(ls(), pattern = "BBA20") == TRUE)]), full_join)
 rm(list = ls()[which(grepl(ls(), pattern = "BBA([0-9])") == T)])
 
@@ -471,6 +514,7 @@ BBA_DRAFT_ALL$`Player Name` = iconv(BBA_DRAFT_ALL$`Player Name`, "UTF-8", "UTF-8
 
   ## Fix team name mistakes
     ## Change " `Drafted By` " to "Tm", and " `Player Name` " to "Name"
+
 BBA_DRAFT_ALL = BBA_DRAFT_ALL %>%
   dplyr::mutate(`Drafted By` = case_when(`Drafted By` == "Chicago" ~ "Chicago Cubs",
                                          `Drafted By` == "Florida Marlins" ~ "Miami Marlins",
@@ -489,6 +533,7 @@ BBA_DRAFT_ALL = BBA_DRAFT_ALL %>%
   ## Remove "Carlos Pena" from Chicago Cubs draft records
     ## Remove duplicates
       ## Correct Lance McCullers' name
+
 BBA_DRAFT_ALL = BBA_DRAFT_ALL %>%
   dplyr::filter(Name != "Carlos Pena") %>%
   dplyr::distinct_all() %>%
@@ -496,6 +541,7 @@ BBA_DRAFT_ALL = BBA_DRAFT_ALL %>%
                                  TRUE ~ Name))
 
   ## Subset relevant draft data
+
 ASTROS_CUBS_DRAFT_SUB = BBA_DRAFT_ALL %>%
   dplyr::filter(grepl(Tm, pattern = "Houston Astros|Chicago Cubs"))
 
@@ -519,6 +565,7 @@ Create dfs
 
 ``` r
   ## Join draft subset dfs with career WAR data -> How good drafting was
+
 ASTROS_CUBS_DRAFT_SUB = ASTROS_CUBS_DRAFT_SUB %>%
   dplyr::select(-key_bbref) %>%
   left_join(CAREER_WAR_df, by = "bbref_id") %>%
@@ -560,6 +607,7 @@ Draft_Results = LEAGUE_DRAFT_SUB %>%
   dplyr::arrange(desc(Career_bWAR))
 
   ## Create subset dfs of standings, value, international signing and free-agent data for the rest of the league
+
 LEAGUE_STAND_SUB = StandALL[ which(StandALL$Tm != "Houston Astros" & StandALL$Tm != "Chicago Cubs"), ]
 LEAGUE_VAL_SUB = TeamValALL[ which(TeamValALL$Tm != "Houston Astros" & TeamValALL$Tm != "Chicago Cubs"), ]
 LEAGUE_INTL_SUB = IntlALL[ which(IntlALL$Team != "HOU" & IntlALL$Team != "CHC"), ]
@@ -570,6 +618,7 @@ Prepare `Astros`, `Cubs`, and `League` `Tanking` dfs
 
 ``` r
   ## Create separate dfs for the Cubs and Astros
+
 ASTROS_TANK_DF = matrix(ncol = 18, nrow = length(seq(2011,2021)))
 CUBS_TANK_DF = matrix(ncol = 18, nrow = length(seq(2011,2021)))
 
@@ -577,6 +626,7 @@ ASTROS_TANK_DF = as.data.frame(ASTROS_TANK_DF)
 CUBS_TANK_DF = as.data.frame(CUBS_TANK_DF)
 
   ## Create column names
+
 colnames(ASTROS_TANK_DF) = c("Year", "Win%", "# Top 5 picks", "# SS Drafted", "# P Drafted",
                              "# College Draftees", "# Draft Picks", "SS %", "P %", "College %",
                              "# Int'l Signings", "Int'l Signing Money Spent", "# FA Contracts",
@@ -585,19 +635,25 @@ colnames(ASTROS_TANK_DF) = c("Year", "Win%", "# Top 5 picks", "# SS Drafted", "#
 
 colnames(CUBS_TANK_DF) = colnames(ASTROS_TANK_DF)
 
+
   ## Create a df for lg avg stats to merge
+
 LG_TANK_DF = matrix(nrow = nrow(ASTROS_TANK_DF), ncol = ncol(ASTROS_TANK_DF))
 LG_TANK_DF = as.data.frame(LG_TANK_DF)
 colnames(LG_TANK_DF) = colnames(ASTROS_TANK_DF)
 
+
   ## Add years
+
 for(i in 1:nrow(ASTROS_TANK_DF)){
   ASTROS_TANK_DF[i,1] = seq(2011,2021)[i]
   CUBS_TANK_DF[i,1] = seq(2011,2021)[i]
   LG_TANK_DF[i,1] = seq(2011,2021)[i]
 }
 
+
   ## Fill Win %
+
 ASTROS_TANK_DF[ ,2] = StandALL$`W-L%`[ which(StandALL$Tm == "Houston Astros") ]
 CUBS_TANK_DF[ ,2] = StandALL$`W-L%`[ which(StandALL$Tm == "Chicago Cubs") ]
 LG_TANK_DF$`Win%` = 0.500
@@ -636,6 +692,7 @@ for (i in 11:21) {
 
 ``` r
 ## Add Career WAR of draftees
+
 ASTROS_TANK_DF = ASTROS_CUBS_DRAFT_SUB %>%
   group_by(Year) %>%
   filter(Tm == "Houston Astros") %>%
@@ -665,13 +722,17 @@ LG_TANK_DF = LEAGUE_DRAFT_SUB %>%
 LG_TANK_DF = LG_TANK_DF %>%
   relocate(Draft_Class_Career_WAR, .after = 19)
 LG_TANK_DF[ , 19] = round(LG_TANK_DF[ , 19], digits = 1)
+
   
 ## Add "WARPM" (WAR Per Million $) col
+
 ASTROS_TANK_DF$WARPM = round(ASTROS_TANK_DF$`Team bWAR` / ASTROS_TANK_DF$`Team payroll`, digits = 2)
 CUBS_TANK_DF$WARPM = round(CUBS_TANK_DF$`Team bWAR` / CUBS_TANK_DF$`Team payroll`, digits = 2)
 LG_TANK_DF$WARPM = round(LG_TANK_DF$`Team bWAR` / LG_TANK_DF$`Team payroll`, digits = 2)
 
+
 ## Add Team col
+
 ASTROS_TANK_DF$Tm = "Houston Astros"
 CUBS_TANK_DF$Tm = "Chicago Cubs"
 LG_TANK_DF$Tm = "LeagueAVG"
@@ -724,7 +785,9 @@ REBUILDERS_df = TeamValALL %>%
   dplyr::arrange(Year) %>%
   dplyr::slice(-c(9,10,19,22,26,29,36,40,47,53,54))
 
+
 ## Re-arrange for display
+
 Printable_REBUILD = REBUILDERS_df %>%
   dplyr::rename(`MLB Trades Made` = Sum_Num_Trades,
                 `FA Signings` = Sum_Num_FAs,
@@ -735,6 +798,7 @@ Printable_REBUILD = REBUILDERS_df %>%
                 `Net Payroll (in M $US)` = Net_Salary,
                 bWAR = WAR) %>%
   # dplyr::slice(-c(4,5,7:11,13:16,20:27,31:38,41,42,45,46)) %>%
+
   dplyr::select(Team, Year, W, L, `W-L%`,
                 GB, DivRank, `MLB Trades Made`,
                 `FA Signings`, `Waiver Claims`,
@@ -742,7 +806,9 @@ Printable_REBUILD = REBUILDERS_df %>%
                 bWAR, `Payroll (in M $US)`, `Payroll Change (in M $US)`, `Net Payroll (in M $US)`) %>%
   dplyr::arrange(`Payroll Change (in M $US)`)
 
+
   ## For plotting with plotly
+
 Rebuild_T = plot_ly(
   type = 'table',
   columnwidth = c(rep(20,12)),
