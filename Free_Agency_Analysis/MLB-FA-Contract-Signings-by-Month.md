@@ -15,7 +15,9 @@ library(ggplot2)
 
 ``` r
 ##### Scrape baseball-reference's free-agent contract data #####
+
 css_selector = "#fa_signings"
+
 
 FA_2018 = read_html("https://www.baseball-reference.com/leagues/majors/2018-free-agents.shtml") %>% 
   html_element(css = css_selector) %>%
@@ -38,24 +40,33 @@ FA_2016 = read_html("https://www.baseball-reference.com/leagues/majors/2016-free
 
 ``` r
 ##### Scrape ESPN's free-agent contract data #####
+
+
 ## ESPN 2019 free-agent signings
+
 ESPN_selector = "#my-players-table"
 
 ESPN2019_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2019/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2018 free-agent signings
+
 ESPN2018_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2018/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2017 free-agent signings
+
 ESPN2017_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2017/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
 
+
 ## ESPN 2016 free-agent signings
+
 ESPN2016_FAs = read_html("https://www.espn.com/mlb/freeagents/_/year/2016/type/signed") %>%
   html_element(css = ESPN_selector) %>%
   html_table()
@@ -73,7 +84,9 @@ ESPN2017_FAs = clean_ESPN_FA_fn(df = ESPN2017_FAs, Year = "2017")
 ESPN2018_FAs = clean_ESPN_FA_fn(df = ESPN2018_FAs, Year = "2018")
 ESPN2019_FAs = clean_ESPN_FA_fn(df = ESPN2019_FAs, Year = "2019")
 
+
   ## Remove extra columns (metrics)
+
 FA_2016 = FA_2016[  , -c(9:32) ]
 FA_2017 = FA_2017[  , -c(9:32) ]
 FA_2018 = FA_2018[  , -c(9:32) ]
@@ -84,7 +97,9 @@ FA_2019 = FA_2019[  , -c(9:32) ]
 
 ``` r
 ##### Merge the data #####
+
 ## Remove MiLB deals by merging the MiLB info from ESPN dfs with the BR dfs
+
 FA_2016 = ESPN2016_FAs %>%
   select(Name, Type) %>%
   filter(Type == "MLB") %>%
